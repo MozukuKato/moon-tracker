@@ -6,19 +6,19 @@
 <title>Advanced Moon Tracker</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
   body {
     margin: 0;
     padding: 0;
     font-family: 'Orbitron', sans-serif;
-    background: radial-gradient(circle at center, #000011, #000022);
+    background: linear-gradient(135deg, #000011, #000022);
     overflow: hidden;
-    color: #0ff;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: background 2s ease;
+    color: #0ff;
   }
 
   /* Moving starfield background with animation */
@@ -29,7 +29,7 @@
     z-index: -1;
   }
 
-  /* Sun in the background, optionally condenses into black hole */
+  /* Sun in the background, condenses into black hole on click */
   #sun {
     position: absolute;
     top: 50%; left: 50%;
@@ -39,18 +39,18 @@
     background: radial-gradient(circle, #fff, #ffcc00);
     box-shadow: 0 0 50px #ffcc00, inset 0 0 30px #fff;
     cursor: pointer;
-    transition: all 0.5s ease;
+    transition: all 1s ease;
     z-index: 0;
   }
   #sun.condensed {
     width: 10px; height: 10px;
-    background: radial-gradient(circle, #000, #000);
+    background: #000;
     box-shadow: none;
     animation: blackHole 1s forwards;
   }
   @keyframes blackHole {
-    0% { width: 200px; height: 200px; box-shadow: 0 0 50px #ffcc00, inset 0 0 30px #fff; }
-    100% { width: 10px; height: 10px; box-shadow: none; }
+    from { width: 200px; height: 200px; border-radius: 50%; box-shadow: 0 0 50px #ffcc00, inset 0 0 30px #fff; }
+    to { width: 10px; height: 10px; border-radius: 50%; background: #000; box-shadow: none; }
   }
 
   /* Orbit container and path */
@@ -60,7 +60,6 @@
     transform: translateX(-50%);
     width: 700px; height: 700px;
   }
-
   #orbit-path {
     position: absolute;
     top: 50%; left: 50%;
@@ -71,7 +70,7 @@
     box-shadow: inset 0 0 10px rgba(0,255,255,0.4);
   }
 
-  /* Orbit rotation animation */
+  /* Orbit rotation for smoothness */
   #moon-orbit {
     width: 100%; height: 100%;
     position: absolute;
@@ -100,6 +99,12 @@
   }
   #moon-wrapper.glow {
     box-shadow: 0 0 80px #0ff inset, 0 0 150px #0ff;
+    animation: pulseGlow 2s infinite;
+  }
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 30px #0ff inset, 0 0 60px #0ff; }
+    50% { box-shadow: 0 0 80px #0ff inset, 0 0 150px #0ff; }
+    100% { box-shadow: 0 0 30px #0ff inset, 0 0 60px #0ff; }
   }
   #moon-img {
     width: 250px; height: 250px;
@@ -108,7 +113,7 @@
     transition: all 0.4s ease;
   }
 
-  /* Glow effect behind moon for depth */
+  /* Glow behind moon for depth */
   .nebula-glow {
     position: absolute;
     top: -100px; left: -100px; right: -100px; bottom: -100px;
@@ -154,7 +159,7 @@
     text-shadow: 0 0 10px #0ff;
   }
 
-  /* Buttons style with glow */
+  /* Buttons with glow */
 button {
   background: #0ff;
   color: #000;
@@ -172,6 +177,7 @@ button:hover {
   box-shadow: 0 0 20px #0ff inset, 0 0 30px #0ff;
 }
 
+/* Controls styling */
 #controls {
   margin-top: 40px;
   display: flex;
@@ -184,7 +190,7 @@ button:hover {
   padding: 10px 15px;
 }
 
-/* Toggle switches */
+/* Toggle styling */
 #toggles {
   display: flex;
   flex-wrap: wrap;
@@ -205,7 +211,7 @@ button:hover {
   accent-color: #0ff;
 }
 
-/* Modal for moon calendar */
+/* Modal for calendar */
 #calendarModal {
   position: fixed;
   top: 0; left: 0;
@@ -252,19 +258,19 @@ button:hover {
 </head>
 <body>
 
-<!-- Moving starfield background -->
+<!-- Starfield background -->
 <canvas id="starfield"></canvas>
 
-<!-- Sun in the background, collapses into black hole on click -->
+<!-- Sun that condenses into a black hole when clicked -->
 <div id="sun"></div>
 
-<!-- Orbit visualization -->
+<!-- Orbit with moon -->
 <div id="orbit-container">
   <div id="orbit">
     <div id="orbit-path"></div>
     <div id="moon-orbit">
-      <div id="moon-wrapper" class="moon-glow">
-        <img id="moon-img" src="" alt="Moon" />
+      <div id="moon-wrapper" class="">
+        <img id="moon-img" src="https://i.imgur.com/tGJGwu8.png" alt="Moon" />
       </div>
     </div>
   </div>
@@ -274,14 +280,14 @@ button:hover {
 <div style="margin-top:20px; width:90%; max-width:950px;">
   <div class="title">🌙 Advanced Moon Tracker</div>
   <div class="nebula-glow"></div>
-  
+
   <!-- Moon phase info -->
   <div style="text-align:center; margin-top:20px;">
     <h2 id="phase-name"></h2>
     <p id="illumination"></p>
     <p id="moon-rise-set"></p>
   </div>
-  
+
   <!-- Buttons -->
   <div style="margin:20px; display:flex; gap:10px; justify-content:center;">
     <button id="prev">&#8592; Prev</button>
@@ -292,7 +298,6 @@ button:hover {
   <!-- Toggles -->
   <div id="toggles" style="margin-top:20px;">
     <label><input type="checkbox" id="showOrbital" checked/> Orbital Data</label>
-    <label><input type="checkbox" id="showCultural" checked/> Cultural Info</label>
   </div>
   
   <!-- Info cards -->
@@ -338,6 +343,7 @@ const phases = [
 
 let currentIdx=0;
 let currentOffset=0;
+let moonGlow=false;
 
 // --- Animate starfield background ---
 const starCanvas=document.getElementById('starfield');
@@ -371,7 +377,7 @@ function drawStars() {
 }
 drawStars();
 
-// --- Sun element that condenses into black hole ---
+// --- Sun that condenses into black hole ---
 const sun=document.getElementById('sun');
 sun.onclick=()=>{
   if(sun.classList.contains('condensed')){
@@ -380,20 +386,14 @@ sun.onclick=()=>{
     sun.classList.add('condensed');
   }
 };
-sun.classList.add('sun');
 const styleSheet=document.createElement('style');
 styleSheet.innerHTML=`@keyframes blackHole { from { width:200px; height:200px; border-radius:50%; background:radial-gradient(circle, #fff, #ffcc00); box-shadow:0 0 50px #ffcc00, inset 0 0 30px #fff; } to { width:10px; height:10px; border-radius:50%; background:#000; box-shadow:none; } }`;
 document.head.appendChild(styleSheet);
 
-// --- Orbit setup ---
-const orbitContainer=document.getElementById('orbit-container');
+// --- Orbit and moon ---
 const moonWrapper=document.getElementById('moon-wrapper');
 const moonImg=document.getElementById('moon-img');
-let currentPhaseIndex=0;
-let currentOffsetDays=0;
-let moonGlow=false;
 
-// Toggle moon glow on click
 moonWrapper.onclick=()=>{
   moonGlow=!moonGlow;
   if(moonGlow){
@@ -403,14 +403,14 @@ moonWrapper.onclick=()=>{
   }
 };
 
-// Animate orbit rotation for smoothness
-const orbitAnim=document.createElement('style');
-orbitAnim.innerHTML=`@keyframes rotateOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
-document.head.appendChild(orbitAnim);
+// --- Animate orbit rotation ---
+const orbitStyle=document.createElement('style');
+orbitStyle.innerHTML=`@keyframes rotateOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
+document.head.appendChild(orbitStyle);
 
-// Animate moon glow
-const glowAnimation=document.createElement('style');
-glowAnimation.innerHTML=`
+// --- Animate moon glow ---
+const glowStyle=document.createElement('style');
+glowStyle.innerHTML=`
   @keyframes pulseGlow {
     0% { box-shadow: 0 0 30px #0ff inset, 0 0 60px #0ff; }
     50% { box-shadow: 0 0 80px #0ff inset, 0 0 150px #0ff; }
@@ -418,9 +418,9 @@ glowAnimation.innerHTML=`
   }
   #moon-wrapper.glow { animation: pulseGlow 2s infinite; }
 `;
-document.head.appendChild(glowAnimation);
+document.head.appendChild(glowStyle);
 
-// --- Update moon phase ---
+// --- Moon phase info display ---
 const phaseNameEl=document.getElementById('phase-name');
 const illumEl=document.getElementById('illumination');
 const moonRiseSetEl=document.getElementById('moon-rise-set');
@@ -430,7 +430,6 @@ function getMoonAge(date){
   const diff=(date - known)/(1000*60*60*24);
   return ((diff % 29.53)+29.53)%29.53;
 }
-
 function getMoonPhaseByAge(age){
   if(age<1.8457 || age>28.7) return phases[0];
   if(age<7.4) return phases[1];
@@ -457,7 +456,6 @@ function fetchMoonData(lat, lon, date){
     }
   })
   .catch(()=>{
-    // fallback to date estimate
     const age=getMoonAge(date);
     currentPhaseIndex=getMoonPhaseByAge(age);
     updateMoonDisplay();
@@ -472,34 +470,30 @@ function updateMoonDisplay() {
   illumEl.innerText='Illumination: '+phases[currentPhaseIndex].illum;
 }
 
-// --- Main update ---
+let currentOffset=0;
+let currentLatLon={lat:0, lon:0}; // default, no location
 function update() {
-  const date=new Date(Date.now()+currentOffsetDays*86400000);
+  const date=new Date(Date.now()+currentOffset*86400000);
   const age=getMoonAge(date);
   currentPhaseIndex=getMoonPhaseByAge(age);
-  // fetch moon data if location set
   if(currentLatLon.lat!==0 || currentLatLon.lon!==0){
     fetchMoonData(currentLatLon.lat, currentLatLon.lon, date);
   } else {
-    // fallback
     updateMoonDisplay();
   }
 }
+document.getElementById('prev').onclick=()=>{ currentOffset--; update(); };
+document.getElementById('next').onclick=()=>{ currentOffset++; update(); };
 
-// --- Navigation ---
-document.getElementById('prev').onclick=()=>{ currentOffsetDays--; update(); };
-document.getElementById('next').onclick=()=>{ currentOffsetDays++; update(); };
-
-// --- Toggle info ---
+// Toggle info
 document.getElementById('showOrbital').onchange=function(){ document.getElementById('orbital-info').style.display=this.checked?'block':'none'; };
-document.getElementById('showCultural').onchange=function(){ document.getElementById('cultural-info').style.display=this.checked?'block':'none'; };
+// No location input or notifications for simplicity
 
-// --- Calendar ---
+// Calendar
 const modal=document.getElementById('calendarModal');
 document.getElementById('calendarBtn').onclick=()=>{ generateCalendar(); modal.style.display='flex'; }
 document.getElementById('closeCalendar').onclick=()=>{ modal.style.display='none'; }
 
-// --- Generate Calendar ---
 function generateCalendar() {
   const grid=document.getElementById('calendarGrid');
   grid.innerHTML='';
@@ -535,11 +529,7 @@ function generateCalendar() {
   }
 }
 
-// --- Initialize ---
-let currentOffset=0;
-update();
-
-// --- Animate background with moving stars ---
+// --- Animate background stars ---
 function animateStars() {
   ctx.fillStyle='rgba(0,0,0,0.2)';
   ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -557,6 +547,7 @@ function animateStars() {
 }
 animateStars();
 
+update();
 </script>
 </body>
 </html>
