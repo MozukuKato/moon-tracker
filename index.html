@@ -1,0 +1,511 @@
+<!-- Load fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(135deg, #000011, #000022);
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    min-height: 100vh;
+    color: #0ff;
+  }
+
+  /* Canvas starfield background */
+  #starfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+  }
+
+  /* Orbit container for moon orbit path & moon */
+  #orbit-container {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 600px; height: 600px;
+    margin: -300px 0 0 -300px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  #orbit {
+    width: 100%; height: 100%;
+    position: relative;
+    animation: rotateOrbit 60s linear infinite;
+    transform-origin: center center;
+  }
+  @keyframes rotateOrbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  #orbit-path {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 350px; height: 350px;
+    margin: -175px 0 0 -175px;
+    border-radius: 50%;
+    border: 2px dashed rgba(0,255,255,0.3);
+  }
+
+  /* Main tracker container */
+  #moon-tracker {
+    position: relative;
+    margin-top: 30px;
+    max-width: 1000px;
+    width: 95%;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    z-index: 2;
+  }
+
+  /* Title styling */
+  .title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #0ff;
+    text-shadow: 0 0 20px #0ff;
+    letter-spacing: 2px;
+  }
+
+  /* Nebula glow effect */
+  .nebula-glow {
+    position: absolute;
+    top: -50px; left: -50px; right: -50px; bottom: -50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,255,255,0.2), transparent 70%);
+    box-shadow: 0 0 80px #0ff, inset 0 0 50px #0ff;
+    animation: nebulaPulse 4s ease-in-out infinite;
+    z-index: 0;
+  }
+  @keyframes nebulaPulse {
+    0% { box-shadow: 0 0 80px #0ff, inset 0 0 50px #0ff; }
+    50% { box-shadow: 0 0 100px #0ff, inset 0 0 70px #0ff; }
+    100% { box-shadow: 0 0 80px #0ff, inset 0 0 50px #0ff; }
+  }
+
+  /* Orbit path circle for visualization */
+  #moon-orbit-path {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 350px; height: 350px;
+    margin: -175px 0 0 -175px;
+    border-radius: 50%;
+    border: 2px dashed rgba(0,255,255,0.3);
+  }
+
+  /* The moon orbit - rotates around center */
+  #moon-orbit {
+    width: 100%; height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: rotateMoon 60s linear infinite;
+    transform-origin: center center;
+  }
+  @keyframes rotateMoon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* The moon's wrapper, centered in orbit container, rotates with orbit */
+  #moon-wrapper {
+    width: 250px; height: 250px;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  #moon-img {
+    width: 250px; height: 250px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #0ff, inset 0 0 10px #0ff;
+    cursor: pointer;
+    animation: pulseGlow 2s ease-in-out;
+  }
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 20px #0ff, inset 0 0 10px #0ff; }
+    50% { box-shadow: 0 0 40px #0ff, inset 0 0 20px #0ff; }
+    100% { box-shadow: 0 0 20px #0ff, inset 0 0 10px #0ff; }
+  }
+
+  /* Info text below moon */
+  #phase-name {
+    margin-top: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+  }
+  #illumination {
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  #moon-rise-set {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  /* Navigation buttons */
+  .nav-buttons {
+    display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; margin-top:20px;
+  }
+  .nav-arrow {
+    font-size: 40px; cursor: pointer;
+    padding: 10px 20px;
+    background: rgba(0,255,255,0.1);
+    border-radius: 50%;
+    box-shadow: 0 0 10px #0ff inset;
+    transition: all 0.2s ease;
+  }
+  .nav-arrow:hover {
+    background: rgba(0,255,255,0.3);
+    transform: scale(1.2);
+  }
+
+  /* Controls & info panels */
+  #controls {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px; position: relative; /* added */
+    z-index: 10; /* ensure clickable */
+  }
+  #location-controls {
+    display: flex; align-items: center; gap: 10px;
+  }
+  #location-input {
+    padding: 8px 12px; font-family: 'Orbitron', sans-serif; font-size: 14px; border-radius: 5px; border: none; width: 250px;
+  }
+  #update-location {
+    padding: 8px 12px; border: none; border-radius: 5px; background: #0ff; color: #000; cursor: pointer;
+  }
+  #update-location:hover {
+    background: #00cccc;
+  }
+
+  /* Toggle switches style */
+  #toggles {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px;
+  }
+  #toggles label {
+    display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: #0ff;
+  }
+
+  /* Info panels styling */
+  #extra-info, #culture-info, #lunar-events, #notifications {
+    margin-top: 20px;
+    max-width: 800px; margin-left: auto; margin-right: auto;
+    padding: 15px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 10px;
+  }
+  #extra-info h3, #culture-info h3, #lunar-events h3 {
+    margin-top: 0; color: #0ff;
+  }
+  #lunar-events ul {
+    padding-left: 20px; margin: 0;
+  }
+  #lunar-events li {
+    margin-bottom: 8px;
+  }
+  #notifications {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0,255,255,0.2);
+    border: 1px solid #0ff;
+  }
+  /* Calendar modal styles */
+  #calendarModal {
+    position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8);
+    display:none; align-items:center; justify-content:center; z-index:9999;
+  }
+  #calendarContent {
+    background:#111; padding:20px; border-radius:8px; max-width:600px; max-height:80%; overflow:auto;
+  }
+  #closeCalendar {
+    margin-top:10px; padding:8px 12px; background:#0ff; border:none; border-radius:5px; cursor:pointer;
+  }
+</style>
+
+<!-- Canvas for stars -->
+<canvas id="starfield"></canvas>
+
+<!-- Orbit path & moon orbit -->
+<div id="orbit-container">
+  <div id="orbit">
+    <div id="orbit-path"></div>
+    <div id="moon-orbit">
+      <div id="moon-wrapper">
+        <img id="moon-img" src="" alt="Moon" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main tracker -->
+<div id="moon-tracker">
+  <div class="title">🌌 Space Moon Tracker</div>
+  <div class="nebula-glow"></div>
+
+  <!-- Moon info -->
+  <div id="phase-info" style="margin-top:20px;">
+    <div id="phase-name"></div>
+    <div id="illumination"></div>
+    <div id="moon-rise-set"></div>
+  </div>
+
+  <!-- Navigation & calendar button -->
+  <div class="nav-buttons">
+    <div class="nav-arrow" id="prev">&lt;</div>
+    <div class="nav-arrow" id="next">&gt;</div>
+    <button id="calendarBtn" style="margin-left:20px; padding:8px 12px; font-family:'Orbitron'; font-size:14px; cursor:pointer;">Show Calendar</button>
+  </div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <div id="location-controls">
+      <input type="text" id="location-input" placeholder="Enter city or coords" />
+      <button id="update-location">Update</button>
+    </div>
+    <div id="toggles">
+      <label><input type="checkbox" id="showOrbital" checked/> Orbital Data</label>
+      <label><input type="checkbox" id="showCultural" checked/> Cultural Info</label>
+      <label><input type="checkbox" id="showEvents" checked/> Lunar Events</label>
+      <label><input type="checkbox" id="showNotifications" checked/> Notifications</label>
+    </div>
+  </div>
+
+  <!-- Info panels -->
+  <div id="extra-info" style="display:none;">
+    <h3>Orbital Data</h3>
+    <p>Eccentricity: 0.055</p>
+    <p>Inclination: 5.14°</p>
+    <p>Synodic Month: 29.53 days</p>
+    <p>Distance from Earth: ~384,400 km</p>
+  </div>
+  <div id="culture-info" style="display:none;">
+    <h3>Cultural & Astronomical</h3>
+    <p>The Moon influences tides, folklore, and cultures. Phases are key to many traditions.</p>
+  </div>
+  <div id="lunar-events" style="display:none;">
+    <h3>Upcoming Lunar Events</h3>
+    <ul>
+      <li>Next Supermoon: August 15, 2023</li>
+      <li>Next Blue Moon: August 31, 2023</li>
+      <li>Eclipse: October 28, 2023</li>
+    </ul>
+  </div>
+  <div id="supermoonHighlight" style="margin-top:10px; font-weight:bold;"></div>
+  <div id="notifications"></div>
+</div>
+
+<!-- Calendar modal for moon phases -->
+<div id="calendarModal">
+  <div id="calendarContent">
+    <h3>Moon Phase Calendar</h3>
+    <div id="calendarGrid"></div>
+    <button id="closeCalendar">Close</button>
+  </div>
+</div>
+
+<script>
+  // =======================
+  // Starfield background
+  // =======================
+  const starCanvas = document.getElementById('starfield');
+  const ctx = starCanvas.getContext('2d');
+  let stars = [];
+  function resizeCanvas() {
+    starCanvas.width = window.innerWidth;
+    starCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  for (let i=0; i<300; i++) {
+    stars.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      radius: Math.random() * 1.5,
+      alpha: Math.random(),
+      dx: (Math.random() - 0.5) * 0.2,
+      dy: (Math.random() - 0.5) * 0.2
+    });
+  }
+  function drawStars() {
+    ctx.fillStyle='rgba(0,0,0,0.2)';
+    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+    ctx.globalAlpha=1;
+    for (let star of stars) {
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(0,255,255,${star.alpha})`;
+      ctx.fill();
+      star.x += star.dx;
+      star.y += star.dy;
+      if (star.x<0 || star.x>window.innerWidth) star.dx*=-1;
+      if (star.y<0 || star.y>window.innerHeight) star.dy*=-1;
+    }
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  // =======================
+  // Moon phases data
+  // =======================
+  const phases = [
+    { name: "New Moon", img: "https://i.imgur.com/tGJGwu8.png", illum: "0%" },
+    { name: "Waxing Crescent", img: "https://i.imgur.com/eZ3TYBb.png", illum: "25%" },
+    { name: "First Quarter", img: "https://i.imgur.com/4wvUyUu.png", illum: "50%" },
+    { name: "Waxing Gibbous", img: "https://i.imgur.com/tZMPofh.png", illum: "75%" },
+    { name: "Full Moon", img: "https://i.imgur.com/9dOdfyQ.png", illum: "100%" },
+    { name: "Waning Gibbous", img: "https://i.imgur.com/gJTYBe4.png", illum: "75%" },
+    { name: "Last Quarter", img: "https://i.imgur.com/pCysGwt.png", illum: "50%" },
+    { name: "Waning Crescent", img: "https://i.imgur.com/McKLzv5.png", illum: "25%" }
+  ];
+
+  let currentPhaseIdx = 0;
+  let currentOffsetDays=0;
+
+  const knownNewMoon = new Date(Date.UTC(2000,0,6,18,14));
+  const lunarCycle=29.53;
+  function getMoonAge(date) {
+    const diffDays = (date - knownNewMoon) / (1000*60*60*24);
+    return ((diffDays % lunarCycle)+lunarCycle)%lunarCycle;
+  }
+
+  // ============================================
+  // Fetch moon info based on location (API)
+  // ============================================
+  function fetchMoonData(lat, lon) {
+    fetch(`https://api.open-meteo.com/v1/planet/moon?latitude=${lat}&longitude=${lon}&current=true`)
+      .then(res => res.json())
+      .then(data => {
+        if(data && data.moon && data.moon.phase !== undefined) {
+          const phaseNum = data.moon.phase; // 0-1
+          if (phaseNum < 0.125) { currentPhaseIdx=0; }
+          else if (phaseNum < 0.375) { currentPhaseIdx=1; }
+          else if (phaseNum < 0.625) { currentPhaseIdx=2; }
+          else if (phaseNum < 0.875) { currentPhaseIdx=3; }
+          else { currentPhaseIdx=4; }
+          updateMoonDisplay();
+          document.getElementById('notificationText').innerHTML= `Location Moon phase: ${phases[currentPhaseIdx].name}`;
+        } else {
+          alert('Failed to fetch moon data.');
+        }
+      }).catch(() => {
+        alert('Error fetching moon data.');
+      });
+  }
+
+  // Update moon display based on current phase index
+  function updateMoonDisplay() {
+    document.getElementById('moon-img').src=phases[currentPhaseIdx].img;
+    document.getElementById('phase-name').innerText=phases[currentPhaseIdx].name;
+    document.getElementById('illumination').innerText='Illumination: '+phases[currentPhaseIdx].illum;
+  }
+
+  // ============================
+  // Location input handler
+  document.getElementById('update-location').onclick=()=>{
+    const loc = document.getElementById('location-input').value.trim();
+    if(!loc){ alert('Please enter a location'); return; }
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(loc)}&limit=1`)
+      .then(res=>res.json())
+      .then(data=>{
+        if(data && data.length>0){
+          fetchMoonData(parseFloat(data[0].lat), parseFloat(data[0].lon));
+        } else {
+          alert('Location not found');
+        }
+      });
+  };
+
+  // ============================
+  // Navigation
+  document.getElementById('prev').onclick=()=>{ currentOffsetDays--; update(); };
+  document.getElementById('next').onclick=()=>{ currentOffsetDays++; update(); };
+
+  // ============================
+  // Toggle info panels
+  document.getElementById('showOrbital').onchange=function(){ document.getElementById('extra-info').style.display=this.checked?'block':'none'; };
+  document.getElementById('showCultural').onchange=function(){ document.getElementById('culture-info').style.display=this.checked?'block':'none'; };
+  document.getElementById('showEvents').onchange=function(){ document.getElementById('lunar-events').style.display=this.checked?'block':'none'; };
+  document.getElementById('showNotifications').onchange=function(){ document.getElementById('notifications').style.display=this.checked?'block':'none'; };
+
+  // ============================
+  // Calendar modal show/hide
+  const calendarModal = document.getElementById('calendarModal');
+  document.getElementById('calendarBtn').onclick=()=>{ calendarModal.style.display='flex'; generateCalendar(); };
+  document.getElementById('closeCalendar').onclick=()=>{ calendarModal.style.display='none'; };
+
+  // Generate moon phase calendar for current year
+  function generateCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML=''; // clear
+    const year = new Date().getFullYear();
+    const firstDay = new Date(year,0,1);
+    const startDay = firstDay.getDay();
+    const totalDays = new Date(year+1,0,0).getDate();
+
+    // fill empty cells
+    for (let i=0; i<startDay; i++) {
+      const cell = document.createElement('div');
+      cell.style.width='40px'; cell.style.height='40px'; cell.style.display='inline-block';
+      grid.appendChild(cell);
+    }
+
+    for (let d=1; d<=totalDays; d++) {
+      const date = new Date(year,0,d);
+      const moonAge = getMoonAge(date);
+      let phaseIdx;
+      if (moonAge < 1.8457 || moonAge > 28.7) phaseIdx=0;
+      else if (moonAge < 7.4) phaseIdx=1;
+      else if (moonAge < 9.3) phaseIdx=2;
+      else if (moonAge < 14.8) phaseIdx=3;
+      else if (moonAge < 16.6) phaseIdx=4;
+      else if (moonAge < 22.0) phaseIdx=5;
+      else if (moonAge < 24.0) phaseIdx=6;
+      else phaseIdx=7;
+
+      const cell = document.createElement('div');
+      cell.style.width='40px'; cell.style.height='40px'; cell.style.display='inline-block'; cell.style.border='1px solid #555'; cell.style.borderRadius='4px';
+      cell.style.margin='2px'; cell.style.verticalAlign='top';
+      cell.style.cursor='pointer';
+      cell.title=`${date.toDateString()}\nPhase: ${phases[phaseIdx].name}`;
+      cell.innerHTML=`<img src="${phases[phaseIdx].img}" style="width:30px; height:30px; display:block; margin:auto;">`;
+      cell.onclick=()=>{ 
+        // set date to selected day
+        currentOffsetDays = Math.round((date - new Date())/86400000);
+        update();
+        calendarModal.style.display='none';
+      };
+      grid.appendChild(cell);
+    }
+  }
+
+  // ============================
+  // Initialize
+  function update() {
+    const date = new Date(Date.now() + currentOffsetDays*86400000);
+    const moonAge = getMoonAge(date);
+    if (moonAge < 1.8457 || moonAge > 28.7) { currentPhaseIdx=0; }
+    else if (moonAge < 7.4) { currentPhaseIdx=1; }
+    else if (moonAge < 9.3) { currentPhaseIdx=2; }
+    else if (moonAge < 14.8) { currentPhaseIdx=3; }
+    else if (moonAge < 16.6) { currentPhaseIdx=4; }
+    else if (moonAge < 22.0) { currentPhaseIdx=5; }
+    else if (moonAge < 24.0) { currentPhaseIdx=6; }
+    else { currentPhaseIdx=7; }
+    document.getElementById('moon-img').src=phases[currentPhaseIdx].img;
+    document.getElementById('phase-name').innerText=phases[currentPhaseIdx].name;
+    document.getElementById('illumination').innerText='Illumination: '+phases[currentPhaseIdx].illum;
+  }
+
+  // Initial call
+  update();
+
+</script>
