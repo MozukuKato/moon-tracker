@@ -121,27 +121,23 @@ function generateCalendar() {
   const grid = document.getElementById('calendarGrid');
   grid.innerHTML = '';
   const year = new Date().getFullYear();
-  const firstDay = new Date(year, 0, 1).getDay();
-  const totalDays = new Date(year + 1, 0, 0).getDate();
-
-  for (let i = 0; i < firstDay; i++) {
-    const cell = document.createElement('div');
-    grid.appendChild(cell);
-  }
-  for (let d = 1; d <= totalDays; d++) {
+  let previousPhaseIndex = -1;
+  for (let d = 1; d <= 365; d++) {
     const date = new Date(year, 0, d);
     const age = getMoonAge(date);
     const phase = getMoonPhase(age);
-    const cell = document.createElement('div');
-    cell.title = `${date.toDateString()}\nPhase: ${phase.name}`;
-    cell.innerHTML = `<img src="${phase.img}" alt="${phase.name}">`;
-    cell.onclick = () => {
-      offsetDays = Math.round((date - new Date()) / 86400000);
-      update();
-      calModal.style.display = 'none';
-    };
-    grid.appendChild(cell);
+    const phaseIdx = phases.findIndex(p => p.name === phase.name);
+    if (phaseIdx !== previousPhaseIndex) {
+      const cell = document.createElement('div');
+      cell.title = `${date.toDateString()}\nPhase: ${phase.name}`;
+      cell.innerHTML = `<img src="${phase.img}" alt="${phase.name}"><br><span style="font-size:10px;">${date.toDateString().slice(4,10)}</span>`;
+      cell.onclick = () => {
+        offsetDays = Math.round((date - new Date()) / 86400000);
+        update();
+        calModal.style.display = 'none';
+      };
+      grid.appendChild(cell);
+      previousPhaseIndex = phaseIdx;
+    }
   }
 }
-
-update();
