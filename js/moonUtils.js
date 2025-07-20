@@ -1,7 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // ... all your existing code here ...
-  update(); // Make sure this runs after everything is defined
-});
+// ============================
+// Data & Variables
+// ============================
 const phases = [
   { name: "New Moon", img: "assets/moon-phase/new_moon.png", illum: "0%" },
   { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
@@ -16,6 +15,9 @@ const phases = [
 let offsetDays = 0;
 let moonGlow = false;
 
+// ============================
+// Animate starfield background
+// ============================
 const starCanvas = document.getElementById('starfield');
 const ctx = starCanvas.getContext('2d');
 
@@ -55,6 +57,9 @@ function animateStars() {
 }
 animateStars();
 
+// ============================
+// Orbit & Moon setup
+// ============================
 const moonWrapper = document.getElementById('moonWrapper');
 const moonImg = document.getElementById('moonImg');
 moonWrapper.onclick = () => {
@@ -66,6 +71,9 @@ moonWrapper.onclick = () => {
   }
 };
 
+// ============================
+// Moon info display
+// ============================
 const phaseTitle = document.getElementById('phaseTitle');
 const phaseName = document.getElementById('phaseName');
 const illumination = document.getElementById('illumination');
@@ -100,6 +108,9 @@ function updateMoon(date) {
   riseSet.innerText = getRiseSet(date);
 }
 
+// ============================
+// Main update
+// ============================
 function update() {
   const date = new Date(Date.now() + offsetDays * 86400000);
   updateMoon(date);
@@ -108,6 +119,7 @@ function update() {
 document.getElementById('prevBtn').onclick = () => { offsetDays--; update(); };
 document.getElementById('nextBtn').onclick = () => { offsetDays++; update(); };
 
+// Calendar modal (unique phases!)
 const calModal = document.getElementById('calendarModal');
 document.getElementById('calendarBtn').onclick = () => {
   generateCalendar();
@@ -141,3 +153,6 @@ function generateCalendar() {
     }
   }
 }
+
+// Initialize everything!
+update();
