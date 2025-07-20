@@ -16,7 +16,7 @@ body {
   height: 100vh;
 }
 
-/* Canvas for animated starfield background */
+/* Canvas for starfield background */
 #starfield {
   position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1;
   background: radial-gradient(ellipse at center, #000011, #000022);
@@ -196,8 +196,7 @@ function animateStars() {
     ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
     ctx.fillStyle=`rgba(0,255,255,${s.alpha})`;
     ctx.fill();
-    s.x+=s.dx;
-    s.y+=s.dy;
+    s.x+=s.dx; s.y+=s.dy;
     if(s.x<0||s.x>window.innerWidth) s.dx*=-1;
     if(s.y<0||s.y>window.innerHeight) s.dy*=-1;
   }
@@ -206,7 +205,7 @@ function animateStars() {
 animateStars();
 
 // ============================
-// Sun: toggle condense into black hole
+// Sun toggle to black hole
 // ============================
 const sun = document.getElementById('sun');
 sun.onclick=()=> {
@@ -272,7 +271,7 @@ function updateMoon(date){
 }
 
 // ============================
-// Main update function
+// Main update
 // ============================
 function update() {
   const date=new Date(Date.now()+offsetDays*86400000);
@@ -328,7 +327,9 @@ function generateCalendar(){
   }
 }
 
-// Animate background stars
+// ============================
+// Animate stars
+// ============================
 function animateStars() {
   ctx.fillStyle='rgba(0,0,0,0.2)';
   ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -346,8 +347,8 @@ function animateStars() {
 }
 animateStars();
 
-// Initialize
+// ============================
+// Initialization
+// ============================
 let offsetDays=0; update();
 </script>
-</body>
-</html>
