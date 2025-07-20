@@ -3,110 +3,118 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Futuristic Moon Tracker</title>
-<!-- Google Fonts -->
+<title>Moon Tracker - Restart</title>
+<!-- Google Fonts for a modern look -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
 <style>
-body {
-  margin: 0; padding: 0; overflow: hidden;
-  font-family: 'Orbitron', sans-serif;
-  background: radial-gradient(ellipse at center, #000011, #000022);
-  color: #0ff;
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  height: 100vh;
-}
+  body {
+    margin: 0; padding: 0; overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(ellipse at center, #000011, #000022);
+    color: #0ff;
+    display: flex; flex-direction: column; align-items: center;
+    height: 100vh;
+  }
 
-/* Canvas for starfield background */
-#starfield {
-  position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1;
-  background: radial-gradient(ellipse at center, #000011, #000022);
-}
+  /* Canvas for animated starfield background */
+  #starfield {
+    position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1;
+  }
 
-/* Top info panel with Moon phase and buttons */
-#topPanel {
-  margin-top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center;
-}
-#moonImage {
-  width: 200px; height: 200px; border-radius:50%; object-fit:cover; box-shadow:0 0 20px #0ff inset;
-}
-#phaseTitle {
-  font-size: 1.5em; margin-top: 10px; text-shadow:0 0 10px #0ff;
-}
-#buttons {
-  margin-top: 15px; display:flex; gap:15px;
-}
-button {
-  background:#0ff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:700; font-family:'Orbitron'; font-size:1em;
-  box-shadow:0 0 10px #0ff inset; transition: all 0.2s;
-}
-button:hover { transform:scale(1.05); box-shadow:0 0 20px #0ff inset; }
+  /* Top info: moon image, phase info, buttons */
+  #topSection {
+    margin-top: 20px; display: flex; flex-direction: column; align-items: center;
+    z-index: 10;
+  }
 
-/* Space background nebula effect */
-#nebula {
-  position: absolute; top:-200px; left:-200px; right:-200px; bottom:-200px; margin:auto; border-radius:50%;
-  background: radial-gradient(circle, rgba(0,255,255,0.2), transparent 70%);
-  box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff;
-  animation: nebulaPulse 12s ease-in-out infinite;
-  z-index:-2;
-}
-@keyframes nebulaPulse {
-  0% { box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff; }
-  50% { box-shadow: 0 0 700px #0ff, inset 0 0 350px #0ff; }
-  100% { box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff; }
-}
+  #moonImage {
+    width: 200px; height: 200px; border-radius: 50%; object-fit: cover;
+    box-shadow: 0 0 20px #0ff inset;
+  }
 
-/* Orbit circle with moon */
-#orbitContainer {
-  position: absolute; top:20%; left:50%; transform:translateX(-50%);
-  width: 600px; height: 600px;
-}
-#orbitPath {
-  position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  width: 400px; height: 400px; border-radius:50%; border:2px dashed rgba(0,255,255,0.4);
-}
-#moonOrbit {
-  width:100%; height:100%; position:absolute; top:0; left:0;
-  display:flex; justify-content:center; align-items:center;
-  animation: rotateOrbit 60s linear infinite;
-  transform-origin: center;
-}
-@keyframes rotateOrbit {
-  from {transform: rotate(0deg);}
-  to {transform: rotate(360deg);}
-}
-#moonWrapper {
-  width: 150px; height: 150px; border-radius:50%; cursor:pointer;
-  box-shadow:0 0 20px #0ff inset;
-  transition: all 0.3s;
-}
-#moonWrapper.glow {
-  box-shadow:0 0 80px #0ff inset, 0 0 160px #0ff;
-  animation: pulseGlow 2s infinite;
-}
-@keyframes pulseGlow {
-  0% { box-shadow:0 0 20px #0ff inset; }
-  50% { box-shadow:0 0 80px #0ff inset, 0 0 160px #0ff; }
-  100% { box-shadow:0 0 20px #0ff inset; }
-}
-#moonImg {
-  width: 150px; height:150px; object-fit:cover; border-radius:50%;
-}
+  #phaseTitle {
+    font-size: 1.5em; margin-top: 10px; text-shadow: 0 0 10px #0ff;
+  }
 
-/* Moon info display */
-#moonInfo {
-  margin-top:20px; text-align:center; font-size:1.2em; text-shadow:0 0 10px #0ff;
-}
-#moonInfo h2 { margin:10px 0; }
-#moonInfo p { margin:5px 0; }
+  #buttons {
+    margin-top: 15px; display: flex; gap: 15px;
+  }
+  button {
+    background: #0ff; border: none; padding: 10px 20px; border-radius: 8px;
+    cursor: pointer; font-family: 'Orbitron'; font-weight: bold; font-size: 1em;
+    box-shadow: 0 0 10px #0ff inset;
+    transition: 0.2s;
+  }
+  button:hover { transform: scale(1.05); box-shadow: 0 0 20px #0ff inset; }
+
+  /* Space nebula glow effect in background */
+  #nebula {
+    position: absolute; top:-200px; left:-200px; right:-200px; bottom:-200px;
+    margin:auto; border-radius:50%;
+    background: radial-gradient(circle, rgba(0,255,255,0.2), transparent 70%);
+    box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff;
+    animation: nebulaPulse 12s ease-in-out infinite;
+    z-index:-2;
+  }
+  @keyframes nebulaPulse {
+    0% { box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff; }
+    50% { box-shadow: 0 0 700px #0ff, inset 0 0 350px #0ff; }
+    100% { box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff; }
+  }
+
+  /* Orbit and Moon */
+  #orbitContainer {
+    position: absolute; top:20%; left:50%; transform:translateX(-50%);
+    width: 600px; height: 600px;
+  }
+  #orbitPath {
+    position: absolute; top:50%; left:50%; transform:translate(-50%, -50%);
+    width: 400px; height: 400px; border-radius:50%; border:2px dashed rgba(0,255,255,0.4);
+  }
+  #moonOrbit {
+    width:100%; height:100%; position:absolute; top:0; left:0;
+    display:flex; justify-content:center; align-items:center;
+    animation: rotateOrbit 60s linear infinite;
+    transform-origin: center;
+  }
+  @keyframes rotateOrbit {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+  }
+  #moonWrapper {
+    width: 150px; height: 150px; border-radius:50%; cursor:pointer;
+    box-shadow:0 0 20px #0ff inset;
+    transition: all 0.3s;
+  }
+  #moonWrapper.glow {
+    box-shadow:0 0 80px #0ff inset, 0 0 160px #0ff;
+    animation: pulseGlow 2s infinite;
+  }
+  @keyframes pulseGlow {
+    0% { box-shadow:0 0 20px #0ff inset; }
+    50% { box-shadow:0 0 80px #0ff inset, 0 0 160px #0ff; }
+    100% { box-shadow:0 0 20px #0ff inset; }
+  }
+  #moonImg {
+    width: 150px; height: 150px; object-fit:cover; border-radius:50%;
+  }
+
+  /* Moon info display */
+  #moonInfo {
+    margin-top: 20px; text-align: center; font-size: 1.2em; text-shadow: 0 0 10px #0ff;
+  }
+  #moonInfo h2 { margin: 10px 0; }
+  #moonInfo p { margin: 5px 0; }
 </style>
 </head>
 <body>
 
+<!-- Space background -->
 <div id="starfield"></div>
 <div id="nebula"></div>
 
-<!-- Top info and buttons -->
-<div id="topPanel">
+<!-- Top Section: Moon image, info, buttons -->
+<div id="topSection">
   <img id="moonImage" src="https://i.imgur.com/tGJGwu8.png" />
   <div id="phaseTitle">Loading...</div>
   <div id="moonInfo">
@@ -121,7 +129,7 @@ button:hover { transform:scale(1.05); box-shadow:0 0 20px #0ff inset; }
   </div>
 </div>
 
-<!-- Orbit with moon -->
+<!-- Orbit with Moon -->
 <div id="orbitContainer">
   <div id="orbit">
     <div id="orbitPath"></div>
@@ -162,12 +170,11 @@ let offsetDays = 0;
 let moonGlow = false;
 
 // ============================
-// Animate Starfield
+// Animate starfield background
 // ============================
 const starCanvas = document.createElement('canvas');
 starCanvas.id='starCanvas'; document.body.appendChild(starCanvas);
 const ctx = starCanvas.getContext('2d');
-let stars=[];
 
 function resizeStars() {
   starCanvas.width=window.innerWidth;
@@ -176,6 +183,7 @@ function resizeStars() {
 window.addEventListener('resize', resizeStars);
 resizeStars();
 
+const stars=[];
 for(let i=0; i<700; i++){
   stars.push({
     x:Math.random()*window.innerWidth,
@@ -281,7 +289,7 @@ function update() {
 document.getElementById('prevBtn').onclick=()=>{ offsetDays--; update(); };
 document.getElementById('nextBtn').onclick=()=>{ offsetDays++; update(); };
 
-// Calendar popup
+// Calendar modal
 const calModal=document.getElementById('calendarModal');
 document.getElementById('calendarBtn').onclick=()=>{
   generateCalendar();
@@ -290,6 +298,7 @@ document.getElementById('calendarBtn').onclick=()=>{
 document.getElementById('closeCalendar').onclick=()=>{
   calModal.style.display='none';
 };
+
 function generateCalendar(){
   const grid=document.getElementById('calendarGrid');
   grid.innerHTML='';
@@ -327,9 +336,7 @@ function generateCalendar(){
   }
 }
 
-// ============================
 // Animate stars
-// ============================
 function animateStars() {
   ctx.fillStyle='rgba(0,0,0,0.2)';
   ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -347,8 +354,7 @@ function animateStars() {
 }
 animateStars();
 
-// ============================
-// Initialization
-// ============================
+// Initialize
 let offsetDays=0; update();
+
 </script>
