@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', function() {
+  // ... all your existing code here ...
+  update(); // Make sure this runs after everything is defined
+});
 const phases = [
   { name: "New Moon", img: "assets/moon-phase/new_moon.png", illum: "0%" },
   { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
