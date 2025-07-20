@@ -4,16 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Moon Tracker</title>
-  <!-- Google Fonts for a modern look -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- Space background -->
   <canvas id="starfield"></canvas>
   <div id="nebula"></div>
-
-  <!-- Top Section: Moon info, buttons -->
   <div id="topSection">
     <div id="phaseTitle">Loading...</div>
     <div id="moonInfo">
@@ -27,20 +23,16 @@
       <button id="calendarBtn">📅 Calendar</button>
     </div>
   </div>
-
-  <!-- Orbit with Moon -->
   <div id="orbitContainer">
     <div id="orbit">
       <div id="orbitPath"></div>
       <div id="moonOrbit">
         <div id="moonWrapper">
-          <img id="moonImg" src="assets/new_moon.png" alt="Moon Phase" />
+          <img id="moonImg" src="assets/moon-phase/new_moon.png" alt="Moon Phase" />
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Calendar Modal -->
   <div id="calendarModal" style="display:none;">
     <div id="calendarBox">
       <h3>Moon Phase Calendar</h3>
@@ -48,7 +40,6 @@
       <button id="closeCalendar">Close</button>
     </div>
   </div>
-
   <script src="js/moonUtils.js"></script>
 </body>
 </html>
