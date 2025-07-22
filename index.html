@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Moon Tracker</title>
+  <title>My Moon Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <canvas id="starfield"></canvas>
-  <div id="nebula"></div>
   <div id="topSection">
     <div id="phaseTitle">Loading...</div>
     <div id="moonInfo">
@@ -23,23 +22,12 @@
       <button id="calendarBtn">📅 Calendar</button>
       <button id="blackHoleBtn">🕳️ Black Hole</button>
     </div>
-    <div id="blackHoleOverlay" style="display:none;"></div>
+    <div id="blackHoleOverlay"></div>
   </div>
   <div id="orbitContainer">
-    <div id="orbit">
-      <div id="orbitPath"></div>
-      <div id="moonOrbit">
-        <div id="moonWrapper">
-          <img id="moonImg" src="assets/moon-phase/new_moon.png" alt="Moon Phase" />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="calendarModal" style="display:none;">
-    <div id="calendarBox">
-      <h3>Moon Phase Calendar</h3>
-      <div id="calendarGrid"></div>
-      <button id="closeCalendar">Close</button>
+    <div id="orbitPath"></div>
+    <div id="moonWrapper">
+      <img id="moonImg" src="assets/moon-phase/new_moon.png" alt="Moon Phase" />
     </div>
   </div>
   <script src="js/moonUtils.js"></script>
