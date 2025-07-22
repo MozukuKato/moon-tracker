@@ -1,17 +1,24 @@
-// --- Black Hole Animation ---
+// --- Black Hole Animation with GSAP ---
 const blackHoleBtn = document.getElementById('blackHoleBtn');
 const blackHoleOverlay = document.getElementById('blackHoleOverlay');
 
 blackHoleBtn.onclick = () => {
   blackHoleOverlay.style.display = 'block';
-  blackHoleOverlay.style.animation = 'none';           // Reset animation
-  void blackHoleOverlay.offsetWidth;                   // Force reflow
-  blackHoleOverlay.style.animation = 'blackHoleExpand 1.5s forwards';
+  blackHoleOverlay.style.opacity = '1';
+  blackHoleOverlay.style.transform = 'scale(0)';
 
-  setTimeout(() => {
-    blackHoleOverlay.style.display = 'none';
-    document.body.classList.add('nebula-bg');
-  }, 1500); // Must match animation duration
+  gsap.to(blackHoleOverlay, {
+    scale: 6,
+    duration: 1.5,
+    ease: "power2.in",
+    opacity: 0.96,
+    onComplete: () => {
+      blackHoleOverlay.style.display = 'none';
+      document.body.classList.add('nebula-bg');
+      // Reset for next time
+      gsap.set(blackHoleOverlay, {scale: 0, opacity: 1});
+    }
+  });
 };
 
 // --- Starfield Animation ---
