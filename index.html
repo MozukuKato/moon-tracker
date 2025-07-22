@@ -1,48 +1,577 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Moon Tracker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ultimate Moon Tracker</title>
+<!-- Google Fonts for a modern look -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+<style>
+  /* Reset & Base Styles */
+  body {
+    margin: 0; padding: 0; overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(ellipse at center, #000011, #000022);
+    color: #0ff;
+    display: flex; flex-direction: column; align-items: center; font-size: 16px;
+    height: 100vh;
+  }
+
+  /* Canvas for animated starfield */
+  #starfield {
+    position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1;
+  }
+
+  /* Space nebula background */
+  #nebula {
+    position: absolute; top:-200px; left:-200px; right:-200px; bottom:-200px;
+    margin:auto; border-radius:50%;
+    background: radial-gradient(circle, rgba(0,255,255,0.2), transparent 70%);
+    box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff;
+    animation: nebulaPulse 12s ease-in-out infinite;
+    z-index:-2;
+  }
+  @keyframes nebulaPulse {
+    0% { box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff; }
+    50% { box-shadow: 0 0 700px #0ff, inset 0 0 350px #0ff; }
+    100% { box-shadow: 0 0 600px #0ff, inset 0 0 300px #0ff; }
+  }
+
+  /* Top UI Panel: Moon Image & Info */
+  #topPanel {
+    position: relative;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+  }
+  #moonDisplay {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  #moonImg {
+    width: 220px; height: 220px; border-radius:50%; object-fit:cover;
+    box-shadow: 0 0 30px #0ff inset, 0 0 60px #0ff;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  #moonImg.glow { box-shadow: 0 0 150px #0ff inset, 0 0 300px #0ff; animation: pulseGlow 2s infinite; }
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 30px #0ff inset; }
+    50% { box-shadow: 0 0 150px #0ff inset, 0 0 300px #0ff; }
+    100% { box-shadow: 0 0 30px #0ff inset; }
+  }
+  #phaseTitle {
+    margin-top: 12px;
+    font-size: 1.8em;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+  }
+  #moonInfo {
+    margin-top: 10px;
+    text-align: center;
+    max-width: 300px;
+  }
+  #moonInfo h2 { margin: 8px 0; font-size: 1.5em; }
+  #moonInfo p { margin: 4px 0; }
+
+  /* Buttons */
+  #buttonContainer {
+    margin-top: 15px;
+    display: flex;
+    gap: 15px;
+  }
+  button {
+    background: #0ff; border: none; padding: 10px 20px; border-radius: 8px;
+    font-family: 'Orbitron'; font-weight: bold; font-size: 1em;
+    cursor:pointer; box-shadow: 0 0 10px #0ff inset;
+    transition: all 0.2s;
+  }
+  button:hover { transform: scale(1.05); box-shadow: 0 0 20px #0ff inset; }
+
+  /* Space Orbit & Moon */
+  #orbitSection {
+    position: absolute; top:20%; left:50%; transform:translateX(-50%);
+    width: 600px; height: 600px;
+  }
+  #orbitPath {
+    position: absolute; top:50%; left:50%; transform:translate(-50%, -50%);
+    width: 400px; height: 400px; border-radius:50%; border:2px dashed rgba(0,255,255,0.4);
+  }
+  #moonOrbit {
+    width:100%; height:100%; position:absolute; top:0; left:0;
+    display:flex; justify-content:center; align-items:center;
+    animation: rotateOrbit 60s linear infinite;
+    transform-origin: center;
+  }
+  @keyframes rotateOrbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  #moonWrapper {
+    width: 150px; height: 150px; border-radius:50%;
+    cursor:pointer;
+    box-shadow:0 0 20px #0ff inset;
+    transition: all 0.3s;
+  }
+  #moonWrapper.glow { box-shadow:0 0 80px #0ff inset, 0 0 160px #0ff; animation: pulseGlow 2s infinite; }
+  @keyframes pulseGlow {
+    0% { box-shadow:0 0 20px #0ff inset; }
+    50% { box-shadow:0 0 80px #0ff inset, 0 0 160px #0ff; }
+    100% { box-shadow:0 0 20px #0ff inset; }
+  }
+  #moonImg {
+    width: 150px; height: 150px; object-fit:cover; border-radius:50%;
+  }
+
+  /* Calendar Modal */
+  #calendarOverlay {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.9); align-items:center; justify-content:center; z-index:9999;
+  }
+  #calendarBox {
+    background:#222; padding:20px; border-radius:15px; max-width:90%; max-height:80%; overflow:auto;
+  }
+  #calendarGrid {
+    display:grid; grid-template-columns:repeat(7,50px); gap:8px; justify-content:center;
+  }
+  #closeCalendarBtn {
+    margin-top:20px; padding:10px 20px; background:#0ff; border:none; border-radius:8px; cursor:pointer; font-weight:bold;
+  }
+
+  /* Responsive adjustments */
+  @media(max-width:768px){
+    #orbitSection { width:80%; height:auto; }
+    #moonImg { width:120px; height:120px; }
+  }
+</style>
 </head>
 <body>
-  <canvas id="starfield"></canvas>
-  <div id="nebula"></div>
-  <div id="topSection">
+
+<!-- Space Nebula -->
+<div id="nebula"></div>
+
+<!-- Starfield Canvas -->
+<canvas id="starfield"></canvas>
+
+<!-- Top Moon Info & Controls -->
+<div id="topPanel">
+  <div id="moonDisplay">
+    <img id="moonImg" src="https://i.imgur.com/tGJGwu8.png" />
     <div id="phaseTitle">Loading...</div>
-    <div id="moonInfo">
-      <h2 id="phaseName">Loading...</h2>
-      <p id="illumination"></p>
-      <p id="riseSet"></p>
-    </div>
-    <div id="buttons">
-  <button id="prevBtn">← Prev</button>
-  <button id="nextBtn">Next →</button>
-  <button id="calendarBtn">📅 Calendar</button>
-  <button id="blackHoleBtn">🕳️ Black Hole</button>
-</div>
-<div id="blackHoleOverlay" style="display:none;"></div>
-    </div>
   </div>
-  <div id="orbitContainer">
-    <div id="orbit">
-      <div id="orbitPath"></div>
-      <div id="moonOrbit">
-        <div id="moonWrapper">
-          <img id="moonImg" src="assets/moon-phase/new_moon.png" alt="Moon Phase" />
-        </div>
+  <div id="moonInfo">
+    <h2 id="phaseName">Loading...</h2>
+    <p id="illumination"></p>
+    <p id="riseSet"></p>
+  </div>
+  <div id="buttonContainer">
+    <button id="prevBtn">← Prev</button>
+    <button id="nextBtn">Next →</button>
+    <button id="calendarBtn">📅 Calendar</button>
+  </div>
+</div>
+
+<!-- Orbit with Moon -->
+<div id="orbitSection">
+  <div id="orbit">
+    <div id="orbitPath"></div>
+    <div id="moonOrbit">
+      <div id="moonWrapper">
+        <img id="moonOrbitImg" src="https://i.imgur.com/tGJGwu8.png" />
       </div>
     </div>
   </div>
-  <div id="calendarModal" style="display:none;">
-    <div id="calendarBox">
-      <h3>Moon Phase Calendar</h3>
-      <div id="calendarGrid"></div>
-      <button id="closeCalendar">Close</button>
-    </div>
+</div>
+
+<!-- Calendar Modal -->
+<div id="calendarOverlay">
+  <div id="calendarBox">
+    <h3 style="color:#0ff;">Moon Phase Calendar</h3>
+    <div id="calendarGrid"></div>
+    <button id="closeCalendarBtn">Close</button>
   </div>
-  <script src="js/moonUtils.js"></script>
+</div>
+
+<script>
+// ============================
+// Data & Variables
+// ============================
+const phases = [
+  { name: "New Moon", img: "https://i.imgur.com/tGJGwu8.png", illum: "0%" },
+  { name: "Waxing Crescent", img: "https://i.imgur.com/eZ3TYBb.png", illum: "25%" },
+  { name: "First Quarter", img: "https://i.imgur.com/4wvUyUu.png", illum: "50%" },
+  { name: "Waxing Gibbous", img: "https://i.imgur.com/tZMPofh.png", illum: "75%" },
+  { name: "Full Moon", img: "https://i.imgur.com/9dOdfyQ.png", illum: "100%" },
+  { name: "Waning Gibbous", img: "https://i.imgur.com/gJTYBe4.png", illum: "75%" },
+  { name: "Last Quarter", img: "https://i.imgur.com/pCysGwt.png", illum: "50%" },
+  { name: "Waning Crescent", img: "https://i.imgur.com/McKLzv5.png", illum: "25%" }
+];
+
+let currentPhaseIndex = 0;
+let offsetDays = 0;
+let moonGlow = false;
+
+// ============================
+// Animate Starfield background
+// ============================
+const starCanvas = document.getElementById('starfield');
+const ctx = starCanvas.getContext('2d');
+
+function resizeStars() {
+  starCanvas.width=window.innerWidth;
+  starCanvas.height=window.innerHeight;
+}
+window.addEventListener('resize', resizeStars);
+resizeStars();
+
+const stars = [];
+for(let i=0; i<700; i++){
+  stars.push({
+    x:Math.random()*window.innerWidth,
+    y:Math.random()*window.innerHeight,
+    size:Math.random()*1.5,
+    alpha:Math.random(),
+    dx:(Math.random()-0.5)*0.2,
+    dy:(Math.random()-0.5)*0.2
+  });
+}
+function animateStars() {
+  ctx.fillStyle='rgba(0,0,0,0.2)';
+  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.globalAlpha=1;
+  for(let s of stars){
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,255,255,${s.alpha})`;
+    ctx.fill();
+    s.x+=s.dx; s.y+=s.dy;
+    if(s.x<0||s.x>window.innerWidth) s.dx*=-1;
+    if(s.y<0||s.y>window.innerHeight) s.dy*=-1;
+  }
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+// ============================
+// Nebula glow effect
+// ============================
+const nebula = document.createElement('div');
+nebula.id='nebula';
+document.body.appendChild(nebula);
+
+// ============================
+// Sun element
+// ============================
+const sun = document.createElement('div');
+sun.id='sun';
+document.body.appendChild(sun);
+sun.onclick=()=> {
+  if(sun.classList.contains('condensed')){
+    sun.classList.remove('condensed');
+  } else {
+    sun.classList.add('condensed');
+  }
+};
+
+// ============================
+// Moon orbit & glow toggle
+// ============================
+const moonWrapper = document.createElement('div');
+moonWrapper.id='moonWrapper';
+const moonImg = document.createElement('img');
+moonImg.id='moonOrbitImg';
+moonImg.src='https://i.imgur.com/tGJGwu8.png';
+moonWrapper.appendChild(moonImg);
+document.body.appendChild(moonWrapper);
+moonWrapper.onclick=()=>{
+  moonGlow=!moonGlow;
+  if(moonGlow){
+    moonWrapper.classList.add('glow');
+  } else {
+    moonWrapper.classList.remove('glow');
+  }
+};
+
+// ============================
+// Info panels
+// ============================
+const phaseName = document.createElement('div');
+phaseName.id='phaseName';
+phaseName.innerText='Loading...';
+
+const illuminationText = document.createElement('div');
+illuminationText.id='illumination';
+
+const riseSetText = document.createElement('div');
+riseSetText.id='riseSet';
+
+const moonInfoContainer = document.createElement('div');
+moonInfoContainer.id='moonInfo';
+moonInfoContainer.style.textAlign='center';
+moonInfoContainer.style.marginTop='10px';
+
+moonInfoContainer.appendChild(phaseName);
+moonInfoContainer.appendChild(illuminationText);
+moonInfoContainer.appendChild(riseSetText);
+
+const topPanel = document.createElement('div');
+topPanel.id='topPanel';
+topPanel.appendChild( document.createElement('div') ).appendChild(document.createElement('div') ) ; // placeholder
+topPanel.appendChild(moonImg);
+topPanel.appendChild(phaseName);
+topPanel.appendChild(illuminationText);
+topPanel.appendChild(riseSetText);
+topPanel.appendChild( document.createElement('div') ).appendChild( document.createElement('div') );
+
+document.body.appendChild(topPanel);
+
+// Buttons
+const btnContainer = document.createElement('div');
+btnContainer.id='buttonContainer';
+
+const prevBtn = document.createElement('button');
+prevBtn.innerText='← Prev';
+const nextBtn = document.createElement('button');
+nextBtn.innerText='Next →';
+const calendarBtn = document.createElement('button');
+calendarBtn.innerText='📅 Calendar';
+
+btnContainer.appendChild(prevBtn);
+btnContainer.appendChild(nextBtn);
+btnContainer.appendChild(calendarBtn);
+document.body.appendChild(btnContainer);
+
+// ============================
+// Orbit section
+// ============================
+const orbitSection = document.createElement('div');
+orbitSection.id='orbitSection';
+
+const orbit = document.createElement('div');
+orbit.id='orbit';
+
+const orbitPath = document.createElement('div');
+orbitPath.id='orbitPath';
+
+const moonOrbit = document.createElement('div');
+moonOrbit.id='moonOrbit';
+
+const moonWrapper2 = document.createElement('div');
+moonWrapper2.id='moonWrapper';
+
+const moonOrbitImg = document.createElement('img');
+moonOrbitImg.id='moonOrbitImg';
+moonOrbitImg.src='https://i.imgur.com/tGJGwu8.png';
+
+moonWrapper2.appendChild(moonOrbitImg);
+moonOrbit.appendChild(moonWrapper2);
+orbit.appendChild(orbitPath);
+orbit.appendChild(moonOrbit);
+orbitSection.appendChild(orbit);
+document.body.appendChild(orbitSection);
+
+// ============================
+// Calendar overlay
+// ============================
+const calendarOverlay = document.createElement('div');
+calendarOverlay.id='calendarOverlay';
+
+const calendarBox = document.createElement('div');
+calendarBox.id='calendarBox';
+
+const calendarTitle = document.createElement('h3');
+calendarTitle.innerText='Moon Phase Calendar';
+
+const calendarGrid = document.createElement('div');
+calendarGrid.id='calendarGrid';
+
+const closeCalBtn = document.createElement('button');
+closeCalBtn.id='closeCalendarBtn';
+closeCalBtn.innerText='Close';
+
+calendarBox.appendChild(calendarTitle);
+calendarBox.appendChild(calendarGrid);
+calendarBox.appendChild(closeCalBtn);
+calendarOverlay.appendChild(calendarBox);
+document.body.appendChild(calendarOverlay);
+
+// ============================
+// Data & Functions
+// ============================
+
+const phases = [
+  { name: "New Moon", img: "https://i.imgur.com/tGJGwu8.png", illum: "0%" },
+  { name: "Waxing Crescent", img: "https://i.imgur.com/eZ3TYBb.png", illum: "25%" },
+  { name: "First Quarter", img: "https://i.imgur.com/4wvUyUu.png", illum: "50%" },
+  { name: "Waxing Gibbous", img: "https://i.imgur.com/tZMPofh.png", illum: "75%" },
+  { name: "Full Moon", img: "https://i.imgur.com/9dOdfyQ.png", illum: "100%" },
+  { name: "Waning Gibbous", img: "https://i.imgur.com/gJTYBe4.png", illum: "75%" },
+  { name: "Last Quarter", img: "https://i.imgur.com/pCysGwt.png", illum: "50%" },
+  { name: "Waning Crescent", img: "https://i.imgur.com/McKLzv5.png", illum: "25%" }
+];
+
+let currentPhaseIndex=0;
+let offsetDays=0;
+let moonGlow=false;
+
+function getMoonAge(date) {
+  const known=new Date(Date.UTC(2000,0,6,18,14));
+  const diff=(date-known)/(1000*60*60*24);
+  return ((diff%29.53)+29.53)%29.53;
+}
+
+function getPhaseByAge(age) {
+  if(age<1.8457 || age>28.7) return phases[0];
+  if(age<7.4) return phases[1];
+  if(age<9.3) return phases[2];
+  if(age<14.8) return phases[3];
+  if(age<16.6) return phases[4];
+  if(age<22) return phases[5];
+  if(age<24) return phases[6];
+  return phases[7];
+}
+
+function updateMoon(date) {
+  const age=getMoonAge(date);
+  const phase=getPhaseByAge(age);
+  document.getElementById('moonOrbitImg').src=phase.img;
+  document.getElementById('phaseName').innerText=phase.name;
+  document.getElementById('illumination').innerText='Illumination: '+phase.illum;
+}
+
+// ============================
+// Animate starfield
+// ============================
+const starCanvas = document.getElementById('starfield');
+const ctx=starCanvas.getContext('2d');
+
+function resizeStars() {
+  starCanvas.width=window.innerWidth;
+  starCanvas.height=window.innerHeight;
+}
+window.addEventListener('resize', resizeStars);
+resizeStars();
+
+const stars=[];
+for(let i=0; i<700; i++){
+  stars.push({
+    x:Math.random()*window.innerWidth,
+    y:Math.random()*window.innerHeight,
+    size:Math.random()*1.5,
+    alpha:Math.random(),
+    dx:(Math.random()-0.5)*0.2,
+    dy:(Math.random()-0.5)*0.2
+  });
+}
+
+function animateStars() {
+  ctx.fillStyle='rgba(0,0,0,0.2)';
+  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.globalAlpha=1;
+  for(let s of stars){
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,255,255,${s.alpha})`;
+    ctx.fill();
+    s.x+=s.dx; s.y+=s.dy;
+    if(s.x<0||s.x>window.innerWidth) s.dx*=-1;
+    if(s.y<0||s.y>window.innerHeight) s.dy*=-1;
+  }
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+// ============================
+// Initialize variables
+// ============================
+let offsetDays=0;
+
+// ============================
+// Set up button events
+// ============================
+document.getElementById('prevBtn').onclick=()=>{ offsetDays--; update(); };
+document.getElementById('nextBtn').onclick=()=>{ offsetDays++; update(); };
+document.getElementById('calendarBtn').onclick=()=>{ generateCalendar(); document.getElementById('calendarOverlay').style.display='flex'; };
+document.getElementById('closeCalendarBtn').onclick=()=>{ document.getElementById('calendarOverlay').style.display='none'; };
+
+// ============================
+// Generate Calendar
+// ============================
+function generateCalendar() {
+  const grid=document.getElementById('calendarGrid');
+  grid.innerHTML='';
+  const year=new Date().getFullYear();
+  const firstDay=new Date(year,0,1).getDay();
+  const totalDays=new Date(year+1,0,0).getDate();
+
+  // Fill empty cells
+  for(let i=0;i<firstDay;i++){
+    const cell=document.createElement('div');
+    cell.style.width='50px'; cell.style.height='50px';
+    grid.appendChild(cell);
+  }
+  // Fill days
+  for(let d=1;d<=totalDays;d++){
+    const date=new Date(year,0,d);
+    const age=getMoonAge(date);
+    let phaseIdx=0;
+    if(age<1.8457 || age>28.7) phaseIdx=0;
+    if(age<7.4) phaseIdx=1;
+    else if(age<9.3) phaseIdx=2;
+    else if(age<14.8) phaseIdx=3;
+    else if(age<16.6) phaseIdx=4;
+    else if(age<22) phaseIdx=5;
+    else if(age<24) phaseIdx=6;
+    else phaseIdx=7;
+    const cell=document.createElement('div');
+    cell.style.width='50px'; cell.style.height='50px'; cell.style.border='1px solid #555'; cell.style.borderRadius='8px'; cell.style.overflow='hidden'; cell.style.cursor='pointer';
+    cell.title=`${date.toDateString()}\nPhase: ${phases[phaseIdx].name}`;
+    cell.innerHTML=`<img src="${phases[phaseIdx].img}" style="width:46px;height:46px;">`;
+    cell.onclick=()=>{
+      offsetDays=Math.round((date - new Date())/86400000);
+      update();
+      document.getElementById('calendarOverlay').style.display='none';
+    }
+    grid.appendChild(cell);
+  }
+}
+
+// ============================
+// Update moon info
+// ============================
+function update() {
+  const date=new Date(Date.now()+offsetDays*86400000);
+  const age=getMoonAge(date);
+  const phase=getPhaseByAge(age);
+  document.getElementById('moonOrbitImg').src=phase.img;
+  document.getElementById('phaseName').innerText=phase.name;
+  document.getElementById('illumination').innerText='Illumination: '+phase.illum;
+}
+
+// ============================
+// Animate starfield
+// ============================
+function animateStars() {
+  ctx.fillStyle='rgba(0,0,0,0.2)';
+  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.globalAlpha=1;
+  for(let s of stars){
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,255,255,${s.alpha})`;
+    ctx.fill();
+    s.x+=s.dx; s.y+=s.dy;
+    if(s.x<0||s.x>window.innerWidth) s.dx*=-1;
+    if(s.y<0||s.y>window.innerHeight) s.dy*=-1;
+  }
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+// Initialize
+update();
+
+</script>
 </body>
 </html>
