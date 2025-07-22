@@ -1,26 +1,24 @@
-// ============================
-// Data & Variables
-// ============================
-const phases = [
-  { name: "New Moon", img: "assets/moon-phase/new_moon.png", illum: "0%" },
-  { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
-  { name: "First Quarter", img: "assets/moon-phase/first_quarter.png", illum: "50%" },
-  { name: "Waxing Gibbous", img: "assets/moon-phase/waxing_gibbous.png", illum: "75%" },
-  { name: "Full Moon", img: "assets/moon-phase/full_moon.png", illum: "100%" },
-  { name: "Waning Gibbous", img: "assets/moon-phase/waning_gibbous.png", illum: "75%" },
-  { name: "Last Quarter", img: "assets/moon-phase/last_quarter.png", illum: "50%" },
-  { name: "Waning Crescent", img: "assets/moon-phase/waning_crescent.png", illum: "25%" }
-];
+// --- Black Hole Animation ---
+const blackHoleBtn = document.getElementById('blackHoleBtn');
+const blackHoleOverlay = document.getElementById('blackHoleOverlay');
 
-let offsetDays = 0;
-let moonGlow = false;
+blackHoleBtn.onclick = () => {
+  blackHoleOverlay.style.display = 'block';
+  blackHoleOverlay.style.opacity = '1';
+  blackHoleOverlay.style.animation = 'none';
+  void blackHoleOverlay.offsetWidth; // Force reflow
+  blackHoleOverlay.style.animation = 'blackHoleExpand 1.5s forwards';
 
-// ============================
-// Animate starfield background
-// ============================
+  setTimeout(() => {
+    blackHoleOverlay.style.opacity = '0';
+    blackHoleOverlay.style.display = 'none';
+    document.body.classList.add('nebula-bg');
+  }, 1500); // Match animation duration
+};
+
+// --- Starfield Animation (for cool background) ---
 const starCanvas = document.getElementById('starfield');
 const ctx = starCanvas.getContext('2d');
-
 function resizeStars() {
   starCanvas.width = window.innerWidth;
   starCanvas.height = window.innerHeight;
@@ -39,7 +37,6 @@ for (let i = 0; i < 700; i++) {
     dy: (Math.random() - 0.5) * 0.2
   });
 }
-
 function animateStars() {
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -57,27 +54,23 @@ function animateStars() {
 }
 animateStars();
 
-// ============================
-// Orbit & Moon setup
-// ============================
-const moonWrapper = document.getElementById('moonWrapper');
-const moonImg = document.getElementById('moonImg');
-moonWrapper.onclick = () => {
-  moonGlow = !moonGlow;
-  if (moonGlow) {
-    moonWrapper.classList.add('glow');
-  } else {
-    moonWrapper.classList.remove('glow');
-  }
-};
-
-// ============================
-// Moon info display
-// ============================
+// --- Dummy Moon Phase Logic (for demo) ---
+const phases = [
+  { name: "New Moon", img: "assets/moon-phase/new_moon.png", illum: "0%" },
+  { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
+  { name: "First Quarter", img: "assets/moon-phase/first_quarter.png", illum: "50%" },
+  { name: "Waxing Gibbous", img: "assets/moon-phase/waxing_gibbous.png", illum: "75%" },
+  { name: "Full Moon", img: "assets/moon-phase/full_moon.png", illum: "100%" },
+  { name: "Waning Gibbous", img: "assets/moon-phase/waning_gibbous.png", illum: "75%" },
+  { name: "Last Quarter", img: "assets/moon-phase/last_quarter.png", illum: "50%" },
+  { name: "Waning Crescent", img: "assets/moon-phase/waning_crescent.png", illum: "25%" }
+];
+let offsetDays = 0;
 const phaseTitle = document.getElementById('phaseTitle');
 const phaseName = document.getElementById('phaseName');
 const illumination = document.getElementById('illumination');
 const riseSet = document.getElementById('riseSet');
+const moonImg = document.getElementById('moonImg');
 
 function getMoonAge(date) {
   const known = new Date(Date.UTC(2000, 0, 6, 18, 14));
@@ -97,7 +90,6 @@ function getMoonPhase(age) {
 function getRiseSet(date) {
   return "Rise: ~6:00 PM / Set: ~6:00 AM";
 }
-
 function updateMoon(date) {
   const age = getMoonAge(date);
   const phase = getMoonPhase(age);
@@ -107,68 +99,10 @@ function updateMoon(date) {
   illumination.innerText = 'Illumination: ' + phase.illum;
   riseSet.innerText = getRiseSet(date);
 }
-
-// ============================
-// Main update
-// ============================
 function update() {
   const date = new Date(Date.now() + offsetDays * 86400000);
   updateMoon(date);
 }
-
 document.getElementById('prevBtn').onclick = () => { offsetDays--; update(); };
 document.getElementById('nextBtn').onclick = () => { offsetDays++; update(); };
-
-// Calendar modal (unique phases!)
-const calModal = document.getElementById('calendarModal');
-document.getElementById('calendarBtn').onclick = () => {
-  generateCalendar();
-  calModal.style.display = 'flex';
-};
-document.getElementById('closeCalendar').onclick = () => {
-  calModal.style.display = 'none';
-};
-
-function generateCalendar() {
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '';
-  const year = new Date().getFullYear();
-  let previousPhaseIndex = -1;
-  for (let d = 1; d <= 365; d++) {
-    const date = new Date(year, 0, d);
-    const age = getMoonAge(date);
-    const phase = getMoonPhase(age);
-    const phaseIdx = phases.findIndex(p => p.name === phase.name);
-    if (phaseIdx !== previousPhaseIndex) {
-      const cell = document.createElement('div');
-      cell.title = `${date.toDateString()}\nPhase: ${phase.name}`;
-      cell.innerHTML = `<img src="${phase.img}" alt="${phase.name}"><br><span style="font-size:10px;">${date.toDateString().slice(4,10)}</span>`;
-      cell.onclick = () => {
-        offsetDays = Math.round((date - new Date()) / 86400000);
-        update();
-        calModal.style.display = 'none';
-      };
-      grid.appendChild(cell);
-      previousPhaseIndex = phaseIdx;
-    }
-  }
-}
-
-// Initialize everything!
 update();
-
-// --- Black Hole Feature ---
-const blackHoleBtn = document.getElementById('blackHoleBtn');
-const blackHoleOverlay = document.getElementById('blackHoleOverlay');
-
-blackHoleBtn.onclick = () => {
-  blackHoleOverlay.style.display = 'block';
-  blackHoleOverlay.style.animation = 'none';
-  void blackHoleOverlay.offsetWidth;
-  blackHoleOverlay.style.animation = '';
-  blackHoleOverlay.style.animation = "blackHoleExpand 1.5s forwards";
-  setTimeout(() => {
-    blackHoleOverlay.style.display = 'none';
-    document.body.classList.add('nebula-bg');
-  }, 1600);
-};
