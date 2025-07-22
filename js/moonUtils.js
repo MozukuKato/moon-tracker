@@ -4,19 +4,17 @@ const blackHoleOverlay = document.getElementById('blackHoleOverlay');
 
 blackHoleBtn.onclick = () => {
   blackHoleOverlay.style.display = 'block';
-  blackHoleOverlay.style.opacity = '1';
-  blackHoleOverlay.style.animation = 'none';
-  void blackHoleOverlay.offsetWidth; // Force reflow
+  blackHoleOverlay.style.animation = 'none';           // Reset animation
+  void blackHoleOverlay.offsetWidth;                   // Force reflow
   blackHoleOverlay.style.animation = 'blackHoleExpand 1.5s forwards';
 
   setTimeout(() => {
-    blackHoleOverlay.style.opacity = '0';
     blackHoleOverlay.style.display = 'none';
     document.body.classList.add('nebula-bg');
-  }, 1500); // Match animation duration
+  }, 1500); // Must match animation duration
 };
 
-// --- Starfield Animation (for cool background) ---
+// --- Starfield Animation ---
 const starCanvas = document.getElementById('starfield');
 const ctx = starCanvas.getContext('2d');
 function resizeStars() {
@@ -54,7 +52,7 @@ function animateStars() {
 }
 animateStars();
 
-// --- Dummy Moon Phase Logic (for demo) ---
+// --- Moon Phase Logic ---
 const phases = [
   { name: "New Moon", img: "assets/moon-phase/new_moon.png", illum: "0%" },
   { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
