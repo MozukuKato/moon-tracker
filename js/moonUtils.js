@@ -156,15 +156,14 @@ function generateCalendar() {
 
 // Initialize everything!
 update();
+
 // --- Black Hole Feature ---
 const blackHoleBtn = document.getElementById('blackHoleBtn');
 const blackHoleOverlay = document.getElementById('blackHoleOverlay');
 
 blackHoleBtn.onclick = () => {
   blackHoleOverlay.style.display = 'block';
-  // Restart animation in case triggered multiple times
   blackHoleOverlay.style.animation = 'none';
-  // Force reflow
   void blackHoleOverlay.offsetWidth;
   blackHoleOverlay.style.animation = '';
   blackHoleOverlay.style.animation = "blackHoleExpand 1.5s forwards";
