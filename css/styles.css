@@ -63,3 +63,10 @@ body.nebula-bg {
   background: radial-gradient(ellipse at center, #2d005e 0%, #0e0030 70%, #020012 100%);
   transition: background 1.5s;
 }
+
+button {
+  padding: 12px 24px;
+  font-size: 1.1em;
+  min-width: 120px;
+  border-radius: 8px;
+}
