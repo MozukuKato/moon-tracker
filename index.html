@@ -2,13 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Moon Tracker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Track the phases of the moon with My Moon Tracker! Includes visuals, illumination details, and rise/set times." />
+  <meta property="og:title" content="Moon Tracker" />
+  <meta property="og:description" content="Track the phases of the moon with visuals and detailed info." />
+  <meta property="og:image" content="assets/moon-phase/new_moon.png" />
+  <title>Moon Tracker</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script type="module" src="js/moonUtils.js"></script>
 </head>
 <body>
+  <header id="topSection">
+  <h1>Moon Tracker</h1>
+</header>
+
+<main>
+  <section id="moonSection">
+    <img id="moonImg" src="assets/moon-phase/new_moon.png" alt="Illustration of the New Moon phase" loading="lazy" />
+    <div>
+      <span id="phaseName">Data not available</span>
+      <span id="illumination">Data not available</span>
+      <span id="riseSet">Data not available</span>
+    </div>
+    <button id="refreshBtn">Refresh Data</button>
+  </section>
+</main>
   <canvas id="starfield"></canvas>
   <div id="topSection">
     <div id="phaseTitle">Loading...</div>
