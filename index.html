@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Moon Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
-  <!-- ✅ Correct placement: inside body -->
-  <button id="blackHoleBtn">🕳️</button>
-
   <canvas id="starfield"></canvas>
   <div id="topSection">
     <div id="phaseTitle">Loading...</div>
@@ -23,6 +20,7 @@
     <div id="buttons">
       <button id="prevBtn">← Prev</button>
       <button id="nextBtn">Next →</button>
+      <button id="blackHoleBtn">🕳️ Black Hole</button>
     </div>
   </div>
   <div id="orbitContainer">
@@ -32,6 +30,6 @@
     </div>
   </div>
   <div id="blackHoleOverlay"></div>
-  <script src="moonUtils.js"></script>
+  <script src="js/moonUtils.js"></script>
 </body>
 </html>
