@@ -1,24 +1,43 @@
-// --- Black Hole Animation with GSAP ---
+// --- Black Hole Animation with Video + JoJo Sound ---
 const blackHoleBtn = document.getElementById('blackHoleBtn');
-const blackHoleOverlay = document.getElementById('blackHoleOverlay');
+const blackHoleVideo = document.getElementById('blackHoleVideo');
+
+// Create audio element for JoJo sound
+const blackHoleSound = new Audio("assets/sounds/appear-c-moon.mp3");
+blackHoleSound.loop = true; // keep looping until animation ends
 
 blackHoleBtn.onclick = () => {
-  blackHoleOverlay.style.display = 'block';
-  blackHoleOverlay.style.opacity = '1';
-  blackHoleOverlay.style.transform = 'scale(0)';
+  // Show & play video
+  blackHoleVideo.style.display = 'block';
+  blackHoleVideo.currentTime = 0;
+  blackHoleVideo.play();
 
-  gsap.to(blackHoleOverlay, {
-    scale: 6,
-    duration: 1.5,
-    ease: "power2.in",
-    opacity: 0.96,
-    onComplete: () => {
-      blackHoleOverlay.style.display = 'none';
-      document.body.classList.add('nebula-bg');
-      // Reset for next time
-      gsap.set(blackHoleOverlay, {scale: 0, opacity: 1});
-    }
-  });
+  // Play JoJo sound
+  blackHoleSound.currentTime = 0;
+  blackHoleSound.play();
+
+  // Keep everything open for 20s
+  setTimeout(() => {
+    // Fade out the sound over 1.5s
+    let fadeDuration = 1500;
+    let fadeStep = 50;
+    let fadeInterval = setInterval(() => {
+      if (blackHoleSound.volume > 0.05) {
+        blackHoleSound.volume -= 0.05;
+      } else {
+        blackHoleSound.pause();
+        blackHoleSound.volume = 1; // reset for next time
+        clearInterval(fadeInterval);
+      }
+    }, fadeStep);
+
+    // Stop and hide video
+    blackHoleVideo.pause();
+    blackHoleVideo.style.display = 'none';
+
+    // Add nebula background
+    document.body.classList.add('nebula-bg');
+  }, 20000);
 };
 
 // --- Starfield Animation ---
@@ -70,6 +89,7 @@ const phases = [
   { name: "Last Quarter", img: "assets/moon-phase/last_quarter.png", illum: "50%" },
   { name: "Waning Crescent", img: "assets/moon-phase/waning_crescent.png", illum: "25%" }
 ];
+
 let offsetDays = 0;
 const phaseTitle = document.getElementById('phaseTitle');
 const phaseName = document.getElementById('phaseName');
@@ -82,6 +102,7 @@ function getMoonAge(date) {
   const diff = (date - known) / (1000 * 60 * 60 * 24);
   return ((diff % 29.53) + 29.53) % 29.53;
 }
+
 function getMoonPhase(age) {
   if (age < 1.8457 || age > 28.7) return phases[0];
   if (age < 7.4) return phases[1];
@@ -92,9 +113,11 @@ function getMoonPhase(age) {
   if (age < 24) return phases[6];
   return phases[7];
 }
+
 function getRiseSet(date) {
   return "Rise: ~6:00 PM / Set: ~6:00 AM";
 }
+
 function updateMoon(date) {
   const age = getMoonAge(date);
   const phase = getMoonPhase(age);
@@ -104,10 +127,13 @@ function updateMoon(date) {
   illumination.innerText = 'Illumination: ' + phase.illum;
   riseSet.innerText = getRiseSet(date);
 }
+
 function update() {
   const date = new Date(Date.now() + offsetDays * 86400000);
   updateMoon(date);
 }
+
 document.getElementById('prevBtn').onclick = () => { offsetDays--; update(); };
 document.getElementById('nextBtn').onclick = () => { offsetDays++; update(); };
+
 update();
