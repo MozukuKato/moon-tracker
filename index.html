@@ -9,7 +9,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
+  <!-- Top-right Black Hole Button -->
+  <button id="blackHoleBtn">🕳️</button>
+
+  <!-- Starfield Background -->
   <canvas id="starfield"></canvas>
+
+  <!-- Moon Phase Info -->
   <div id="topSection">
     <div id="phaseTitle">Loading...</div>
     <div id="moonInfo">
@@ -20,16 +26,27 @@
     <div id="buttons">
       <button id="prevBtn">← Prev</button>
       <button id="nextBtn">Next →</button>
-      <button id="blackHoleBtn">🕳️ Black Hole</button>
     </div>
   </div>
+
+  <!-- Orbit Container -->
   <div id="orbitContainer">
     <div id="orbitPath"></div>
     <div id="moonWrapper">
       <img id="moonImg" src="assets/moon-phase/new_moon.png" alt="Moon Phase" />
     </div>
   </div>
+
+  <!-- Black Hole Overlay (backup gradient effect) -->
   <div id="blackHoleOverlay"></div>
+
+  <!-- Black Hole Video Overlay -->
+  <video id="blackHoleVideo" preload="auto">
+    <source src="assets/blackhole.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- JS logic -->
   <script src="js/moonUtils.js"></script>
 </body>
 </html>
