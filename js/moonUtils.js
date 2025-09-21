@@ -19,7 +19,6 @@ blackHoleBtn.onclick = () => {
   // Keep everything open for 20s
   setTimeout(() => {
     // Fade out the sound over 1.5s
-    let fadeDuration = 1500;
     let fadeStep = 50;
     let fadeInterval = setInterval(() => {
       if (blackHoleSound.volume > 0.05) {
@@ -43,6 +42,7 @@ blackHoleBtn.onclick = () => {
 // --- Starfield Animation ---
 const starCanvas = document.getElementById('starfield');
 const ctx = starCanvas.getContext('2d');
+
 function resizeStars() {
   starCanvas.width = window.innerWidth;
   starCanvas.height = window.innerHeight;
@@ -61,6 +61,7 @@ for (let i = 0; i < 700; i++) {
     dy: (Math.random() - 0.5) * 0.2
   });
 }
+
 function animateStars() {
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
