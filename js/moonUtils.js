@@ -1,43 +1,62 @@
-// --- Black Hole Animation with Video + JoJo Sound ---
+// --- Black Hole Video + JoJo Sound + GSAP ---
 const blackHoleBtn = document.getElementById('blackHoleBtn');
+const blackHoleWrapper = document.getElementById('blackHoleWrapper');
 const blackHoleVideo = document.getElementById('blackHoleVideo');
 
-// Create audio element for JoJo sound
-const blackHoleSound = new Audio("assets/sounds/appear-c-moon.mp3");
-blackHoleSound.loop = true; // keep looping until animation ends
+const blackHoleSound = new Audio("./assets/sounds/appear-c-moon.mp3");
+blackHoleSound.loop = true;
 
 blackHoleBtn.onclick = () => {
-  // Show & play video
-  blackHoleVideo.style.display = 'block';
+  // Show wrapper and reset scale
+  blackHoleWrapper.style.display = 'block';
+  gsap.set(blackHoleWrapper, { scale: 0, opacity: 1 });
+
+  // Play video and audio
   blackHoleVideo.currentTime = 0;
-  blackHoleVideo.play();
+  blackHoleVideo.loop = true; // loop if shorter than 20s
+  blackHoleVideo.play().catch(err => console.log('Video play blocked:', err));
 
-  // Play JoJo sound
   blackHoleSound.currentTime = 0;
-  blackHoleSound.play();
+  blackHoleSound.play().catch(err => console.log('Audio play blocked:', err));
 
-  // Keep everything open for 20s
+  // GSAP zoom animation
+  gsap.to(blackHoleWrapper, {
+    scale: 6,
+    duration: 1.5,
+    ease: "power2.in",
+    opacity: 0.96
+  });
+
+  // After 20 seconds, stop everything
   setTimeout(() => {
-    // Fade out the sound over 1.5s
-    let fadeStep = 50;
-    let fadeInterval = setInterval(() => {
-      if (blackHoleSound.volume > 0.05) {
-        blackHoleSound.volume -= 0.05;
-      } else {
-        blackHoleSound.pause();
-        blackHoleSound.volume = 1; // reset for next time
-        clearInterval(fadeInterval);
-      }
-    }, fadeStep);
-
-    // Stop and hide video
+    fadeOutAudio(blackHoleSound, 1500);
     blackHoleVideo.pause();
-    blackHoleVideo.style.display = 'none';
 
-    // Add nebula background
+    gsap.to(blackHoleWrapper, {
+      opacity: 0,
+      duration: 0.5,
+      onComplete: () => {
+        blackHoleWrapper.style.display = 'none';
+      }
+    });
+
     document.body.classList.add('nebula-bg');
   }, 20000);
 };
+
+// Helper function: fade out audio
+function fadeOutAudio(audio, duration) {
+  let step = 50;
+  let fadeInterval = setInterval(() => {
+    if (audio.volume > 0.05) {
+      audio.volume -= 0.05;
+    } else {
+      audio.pause();
+      audio.volume = 1; // reset for next time
+      clearInterval(fadeInterval);
+    }
+  }, step);
+}
 
 // --- Starfield Animation ---
 const starCanvas = document.getElementById('starfield');
@@ -81,60 +100,6 @@ animateStars();
 
 // --- Moon Phase Logic ---
 const phases = [
-  { name: "New Moon", img: "assets/moon-phase/new_moon.png", illum: "0%" },
-  { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
-  { name: "First Quarter", img: "assets/moon-phase/first_quarter.png", illum: "50%" },
-  { name: "Waxing Gibbous", img: "assets/moon-phase/waxing_gibbous.png", illum: "75%" },
-  { name: "Full Moon", img: "assets/moon-phase/full_moon.png", illum: "100%" },
-  { name: "Waning Gibbous", img: "assets/moon-phase/waning_gibbous.png", illum: "75%" },
-  { name: "Last Quarter", img: "assets/moon-phase/last_quarter.png", illum: "50%" },
-  { name: "Waning Crescent", img: "assets/moon-phase/waning_crescent.png", illum: "25%" }
-];
-
-let offsetDays = 0;
-const phaseTitle = document.getElementById('phaseTitle');
-const phaseName = document.getElementById('phaseName');
-const illumination = document.getElementById('illumination');
-const riseSet = document.getElementById('riseSet');
-const moonImg = document.getElementById('moonImg');
-
-function getMoonAge(date) {
-  const known = new Date(Date.UTC(2000, 0, 6, 18, 14));
-  const diff = (date - known) / (1000 * 60 * 60 * 24);
-  return ((diff % 29.53) + 29.53) % 29.53;
-}
-
-function getMoonPhase(age) {
-  if (age < 1.8457 || age > 28.7) return phases[0];
-  if (age < 7.4) return phases[1];
-  if (age < 9.3) return phases[2];
-  if (age < 14.8) return phases[3];
-  if (age < 16.6) return phases[4];
-  if (age < 22) return phases[5];
-  if (age < 24) return phases[6];
-  return phases[7];
-}
-
-function getRiseSet(date) {
-  return "Rise: ~6:00 PM / Set: ~6:00 AM";
-}
-
-function updateMoon(date) {
-  const age = getMoonAge(date);
-  const phase = getMoonPhase(age);
-  moonImg.src = phase.img;
-  phaseTitle.innerText = phase.name + ' (' + date.toDateString() + ')';
-  phaseName.innerText = phase.name;
-  illumination.innerText = 'Illumination: ' + phase.illum;
-  riseSet.innerText = getRiseSet(date);
-}
-
-function update() {
-  const date = new Date(Date.now() + offsetDays * 86400000);
-  updateMoon(date);
-}
-
-document.getElementById('prevBtn').onclick = () => { offsetDays--; update(); };
-document.getElementById('nextBtn').onclick = () => { offsetDays++; update(); };
-
-update();
+  { name: "New Moon", img: "./assets/moon-phase/new_moon.png", illum: "0%" },
+  { name: "Waxing Crescent", img: "./assets/moon-phase/waxing_crescent.png", illum: "25%" },
+  { name: "First Quarter", img: "./assets/moon-phase/
