@@ -1,4 +1,4 @@
-// --- Black Hole Video + JoJo Sound + GSAP ---
+// --- Black Hole Video + JoJo Sound + GSAP + Temporary Nebula ---
 const blackHoleBtn = document.getElementById('blackHoleBtn');
 const blackHoleWrapper = document.getElementById('blackHoleWrapper');
 const blackHoleVideo = document.getElementById('blackHoleVideo');
@@ -40,14 +40,21 @@ blackHoleBtn.onclick = () => {
       }
     });
 
-    document.body.classList.add('nebula-bg');
+    // Apply temporary nebula effect
+    if (!document.body.classList.contains('nebula-bg')) {
+      document.body.classList.add('nebula-bg');
+      // Remove after 3 seconds
+      setTimeout(() => {
+        document.body.classList.remove('nebula-bg');
+      }, 3000);
+    }
   }, 20000);
 };
 
-// Helper function: fade out audio
+// Helper function: fade out audio smoothly
 function fadeOutAudio(audio, duration) {
-  let step = 50;
-  let fadeInterval = setInterval(() => {
+  const step = 50;
+  const fadeInterval = setInterval(() => {
     if (audio.volume > 0.05) {
       audio.volume -= 0.05;
     } else {
@@ -57,49 +64,3 @@ function fadeOutAudio(audio, duration) {
     }
   }, step);
 }
-
-// --- Starfield Animation ---
-const starCanvas = document.getElementById('starfield');
-const ctx = starCanvas.getContext('2d');
-
-function resizeStars() {
-  starCanvas.width = window.innerWidth;
-  starCanvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeStars);
-resizeStars();
-
-const stars = [];
-for (let i = 0; i < 700; i++) {
-  stars.push({
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
-    size: Math.random() * 1.5,
-    alpha: Math.random(),
-    dx: (Math.random() - 0.5) * 0.2,
-    dy: (Math.random() - 0.5) * 0.2
-  });
-}
-
-function animateStars() {
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-  ctx.globalAlpha = 1;
-  for (let s of stars) {
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(0,255,255,${s.alpha})`;
-    ctx.fill();
-    s.x += s.dx; s.y += s.dy;
-    if (s.x < 0 || s.x > window.innerWidth) s.dx *= -1;
-    if (s.y < 0 || s.y > window.innerHeight) s.dy *= -1;
-  }
-  requestAnimationFrame(animateStars);
-}
-animateStars();
-
-// --- Moon Phase Logic ---
-const phases = [
-  { name: "New Moon", img: "./assets/moon-phase/new_moon.png", illum: "0%" },
-  { name: "Waxing Crescent", img: "./assets/moon-phase/waxing_crescent.png", illum: "25%" },
-  { name: "First Quarter", img: "./assets/moon-phase/
