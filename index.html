@@ -40,11 +40,13 @@
   <!-- Black Hole Overlay (backup gradient effect) -->
   <div id="blackHoleOverlay"></div>
 
-  <!-- Black Hole Video Overlay -->
-  <video id="blackHoleVideo" preload="auto" style="display:none; width:100%; height:100%;">
-    <source src="./assets/videos/blackhole.mp4" type="video/mp4" />
-    Sorry, your browser does not support HTML5 video.
-  </video>
+  <!-- Black Hole Video Overlay Wrapper -->
+  <div id="blackHoleWrapper" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; pointer-events:none;">
+    <video id="blackHoleVideo" preload="auto" style="width:100%; height:100%;">
+      <source src="./assets/videos/blackhole.mp4" type="video/mp4" />
+      Sorry, your browser does not support HTML5 video.
+    </video>
+  </div>
 
   <!-- JS logic -->
   <script src="./js/moonUtils.js"></script>
