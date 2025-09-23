@@ -92,9 +92,9 @@ const phases = [
   { name: "Waxing Crescent", img: "assets/moon-phase/waxing_crescent.png", illum: "25%" },
   { name: "First Quarter", img: "assets/moon-phase/first_quarter.png", illum: "50%" },
   { name: "Waxing Gibbous", img: "assets/moon-phase/waxing_gibbous.png", illum: "75%" },
-  { name: "Full Moon", img: "assets/moon-phase/full.png", illum: "100%" }, // updated
+  { name: "Full Moon", img: "assets/moon-phase/full.png", illum: "100%" }, // matches your files
   { name: "Waning Gibbous", img: "assets/moon-phase/waning_gibbous.png", illum: "75%" },
-  { name: "Last Quarter", img: "assets/moon-phase/third_quarter.png", illum: "50%" }, // updated
+  { name: "Last Quarter", img: "assets/moon-phase/third_quarter.png", illum: "50%" }, // matches your files
   { name: "Waning Crescent", img: "assets/moon-phase/waning_crescent.png", illum: "25%" }
 ];
 
@@ -104,6 +104,25 @@ const phaseName = document.getElementById('phaseName');
 const illumination = document.getElementById('illumination');
 const riseSet = document.getElementById('riseSet');
 const moonImg = document.getElementById('moonImg');
+
+// --- WeatherAPI Integration for Moonrise/Set ---
+async function getRiseSet(date) {
+  const apiKey = "1df7e5fab94b466dac8223232252309"; // ✅ your key
+  const formattedDate = date.toISOString().split("T")[0];
+
+  const apiUrl = `https://api.weatherapi.com/v1/astronomy.json?key=${apiKey}&q=auto:ip&dt=${formattedDate}`;
+
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) throw new Error("API error");
+    const data = await response.json();
+    const astro = data.astronomy.astro;
+    return `Rise: ${astro.moonrise} / Set: ${astro.moonset}`;
+  } catch (err) {
+    console.error("Moonrise/set fetch failed:", err);
+    return "Rise/Set unavailable";
+  }
+}
 
 function getMoonAge(date) {
   const known = new Date(Date.UTC(2000, 0, 6, 18, 14));
@@ -122,18 +141,17 @@ function getMoonPhase(age) {
   return phases[7];
 }
 
-function getRiseSet(date) {
-  return "Rise: ~6:00 PM / Set: ~6:00 AM"; // Placeholder until API added
-}
-
-function updateMoon(date) {
+async function updateMoon(date) {
   const age = getMoonAge(date);
   const phase = getMoonPhase(age);
   moonImg.src = phase.img;
   phaseTitle.innerText = phase.name + ' (' + date.toDateString() + ')';
   phaseName.innerText = phase.name;
   illumination.innerText = 'Illumination: ' + phase.illum;
-  riseSet.innerText = getRiseSet(date);
+
+  riseSet.innerText = "Loading moon times...";
+  const times = await getRiseSet(date);
+  riseSet.innerText = times;
 }
 
 function update() {
