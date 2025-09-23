@@ -6,10 +6,12 @@ const blackHoleSound = new Audio("assets/sounds/appear-c-moon.mp3");
 blackHoleSound.loop = true;
 
 blackHoleBtn.onclick = () => {
-  // Show video
+  // Show video with fade in
   blackHoleVideo.style.display = 'block';
+  blackHoleVideo.style.opacity = '1';
   blackHoleVideo.currentTime = 0;
-  blackHoleVideo.loop = true; // in case it’s shorter than 20s
+  blackHoleVideo.loop = true;
+  blackHoleVideo.muted = false; // unmute after click
   blackHoleVideo.play().catch(err => console.log('Video play blocked:', err));
 
   // Play JoJo sound
@@ -20,7 +22,11 @@ blackHoleBtn.onclick = () => {
   setTimeout(() => {
     fadeOutAudio(blackHoleSound, 1500);
     blackHoleVideo.pause();
-    blackHoleVideo.style.display = 'none';
+    blackHoleVideo.style.opacity = '0';
+
+    setTimeout(() => {
+      blackHoleVideo.style.display = 'none';
+    }, 800); // matches fade-out duration
 
     // ✅ Apply nebula effect permanently
     if (!document.body.classList.contains('nebula-bg')) {
@@ -44,6 +50,7 @@ function fadeOutAudio(audio, duration) {
     }
   }, step);
 }
+
 
 // --- Starfield Animation ---
 const starCanvas = document.getElementById('starfield');
